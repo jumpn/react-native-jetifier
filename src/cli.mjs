@@ -6,27 +6,36 @@ import * as withState from "./cliState";
 
 const jetificableGroupsPath = "./jetificableGroups.json";
 
-const finish = (rnJetifier, jetificableGroups) =>
+const saveAndJetifyJetificableGroups = (rnJetifier, jetificableGroups) =>
   withJetificableGroup
     .save(jetificableGroupsPath, jetificableGroups)
     .then(() => withJetificableGroup.jetifyAll(rnJetifier, jetificableGroups));
 
 const onJetificableGroups = (state, rnJetifier) => jetificableGroups =>
-  finish(rnJetifier, [...state.jetificableGroups, ...jetificableGroups]);
+  saveAndJetifyJetificableGroups(rnJetifier, [
+    ...state.jetificableGroups,
+    ...jetificableGroups
+  ]);
 
-const onRnJetifier = state => rnJetifier =>
+const retrieveJetificableGroups = (rnJetifier, state) =>
   withJetificableGroup
     .retrieveAllFrom(rnJetifier, state.packageInfos)
     .then(onJetificableGroups(state, rnJetifier));
 
-const start = state => withRnJetifier.retrieve().then(onRnJetifier(state));
-
-const onState = state => {
+const onRetrieveDependencies = ([rnJetifier, state]) => {
   if (state.packageInfos.length > 0) {
-    start(state);
+    retrieveJetificableGroups(rnJetifier, state);
+  } else {
+    withJetificableGroup.jetifyAll(rnJetifier, state.jetificableGroups);
   }
 };
 
-const run = () => withState.create(jetificableGroupsPath).then(onState);
+const retrieveDependencies = () =>
+  Promise.all([
+    withRnJetifier.retrieve(),
+    withState.create(jetificableGroupsPath)
+  ]);
+
+const run = () => retrieveDependencies().then(onRetrieveDependencies);
 
 export {run};
