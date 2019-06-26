@@ -1,0 +1,78 @@
+{
+  "name": "@jumpn/react-native-jetifier",
+  "version": "0.0.0",
+  "description": "React Native Jetifier",
+  "author": "Mauro Titimoli <mauro@jumpn.com> (https://github.com/mgtitimoli)",
+  "license": "MIT",
+  "keywords": [
+    "react-native",
+    "android",
+    "jetpack",
+    "androidx",
+    "jetifier"
+  ],
+  "bugs": {
+    "url": "https://github.com/jumpn/react-native-jetifier/issues"
+  },
+  "homepage": "https://github.com/jumpn/react-native-jetifier#readme",
+  "bin": {
+    "react-native-jetifier": "dist/run.js"
+  },
+  "scripts": {
+    "build:src:flow": "flow-copy-source -v src dist",
+    "build:src:compile": "babel --verbose --delete-dir-on-start --copy-files --out-dir dist src",
+    "build:src": "yarn build:src:compile && yarn build:src:flow",
+    "build:readme": "yarn doctoc README.md",
+    "lint": "eslint --rule 'flowtype-errors/show-errors: error'",
+    "lint:fix": "yarn run lint --fix",
+    "prepack": "yarn build:src",
+    "version": "yarn run build:readme && git add README.md",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "build:src": "src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jumpn/react-native-jetifier.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "fast-glob": "3.0.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.4.4",
+    "@babel/core": "7.4.5",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "7.4.4",
+    "@babel/plugin-proposal-optional-chaining": "7.2.0",
+    "@babel/plugin-syntax-import-meta": "7.2.0",
+    "@babel/plugin-transform-runtime": "7.4.4",
+    "@babel/preset-env": "7.4.5",
+    "@babel/preset-flow": "7.0.0",
+    "@babel/runtime": "7.4.5",
+    "@commitlint/cli": "8.0.0",
+    "@commitlint/config-conventional": "8.0.0",
+    "@commitlint/prompt-cli": "8.0.0",
+    "babel-eslint": "10.0.2",
+    "core-js": "3.1.4",
+    "doctoc": "1.4.0",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-config-prettier": "5.0.0",
+    "eslint-plugin-babel": "5.3.0",
+    "eslint-plugin-flowtype": "3.10.3",
+    "eslint-plugin-flowtype-errors": "4.1.0",
+    "eslint-plugin-import": "2.17.3",
+    "eslint-plugin-prefer-arrow": "1.1.5",
+    "eslint-plugin-prettier": "3.1.0",
+    "flow-bin": "0.101.0",
+    "flow-copy-source": "2.0.6",
+    "husky": "2.5.0",
+    "lint-staged": "8.2.1",
+    "np": "5.0.3",
+    "npm-watch": "0.6.0",
+    "prettier": "1.18.2"
+  }
+}
