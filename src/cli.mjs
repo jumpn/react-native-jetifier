@@ -6,10 +6,13 @@ import * as withState from "./cliState";
 
 const jetificableGroupsPath = "./jetificableGroups.json";
 
+const jetifyAllJetificableGroups = (rnJetifier, jetificableGroups) =>
+  jetificableGroups.forEach(withJetificableGroup.jetify(rnJetifier));
+
 const saveAndJetifyJetificableGroups = (rnJetifier, jetificableGroups) =>
   withJetificableGroup
     .save(jetificableGroupsPath, jetificableGroups)
-    .then(() => withJetificableGroup.jetifyAll(rnJetifier, jetificableGroups));
+    .then(() => jetifyAllJetificableGroups(rnJetifier, jetificableGroups));
 
 const onJetificableGroups = (state, rnJetifier) => jetificableGroups =>
   saveAndJetifyJetificableGroups(rnJetifier, [
@@ -23,10 +26,10 @@ const retrieveJetificableGroups = (rnJetifier, state) =>
     .then(onJetificableGroups(state, rnJetifier));
 
 const onRetrieveDependencies = ([rnJetifier, state]) => {
-  if (state.packageInfos.length > 0) {
-    retrieveJetificableGroups(rnJetifier, state);
+  if (state.packageInfos.length === 0) {
+    jetifyAllJetificableGroups(rnJetifier, state.jetificableGroups);
   } else {
-    withJetificableGroup.jetifyAll(rnJetifier, state.jetificableGroups);
+    retrieveJetificableGroups(rnJetifier, state);
   }
 };
 

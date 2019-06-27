@@ -50,27 +50,16 @@ const retrieveAllFrom = (
 ): Promise<Array<JetificableGroup>> =>
   Promise.all(packageInfos.map(retrieveFrom(rnJetifier)));
 
-const reduceGetAllJetificablePaths = (
-  allJetificablePaths,
-  {jetificablePaths}
-) => [...allJetificablePaths, ...jetificablePaths];
-
-const getAllJetificablePaths = (jetificableGroups): Array<string> =>
-  jetificableGroups.reduce(reduceGetAllJetificablePaths, []);
-
-const jetifyAll = (
-  rnJetifier: RnJetifier,
-  jetificableGroups: Array<JetificableGroup>
+const jetify = (rnJetifier: RnJetifier) => (
+  jetificableGroup: JetificableGroup
 ) =>
-  getAllJetificablePaths(jetificableGroups).forEach(
-    withRnJetifier.jetify(rnJetifier)
-  );
+  jetificableGroup.jetificablePaths.forEach(withRnJetifier.jetify(rnJetifier));
 
 const getWith = (
   jetificableGroupDict: JetificableGroupDict,
   packageInfo: PackageInfo
 ): void | JetificableGroup => jetificableGroupDict[getDictKey(packageInfo)];
 
-export {getWith, jetifyAll, retrieveAllFrom, retrieveSavedIfAny, save};
+export {getWith, jetify, retrieveAllFrom, retrieveSavedIfAny, save};
 
 export type {JetificableGroup};
