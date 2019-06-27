@@ -14,7 +14,7 @@ const saveAndJetifyJetificableGroups = (rnJetifier, jetificableGroups) =>
     .save(jetificableGroupsPath, jetificableGroups)
     .then(() => jetifyAllJetificableGroups(rnJetifier, jetificableGroups));
 
-const onJetificableGroups = (state, rnJetifier) => jetificableGroups =>
+const onJetificableGroups = (rnJetifier, state) => jetificableGroups =>
   saveAndJetifyJetificableGroups(rnJetifier, [
     ...state.jetificableGroups,
     ...jetificableGroups
@@ -23,7 +23,7 @@ const onJetificableGroups = (state, rnJetifier) => jetificableGroups =>
 const retrieveJetificableGroups = (rnJetifier, state) =>
   withJetificableGroup
     .retrieveAllFrom(rnJetifier, state.packageInfos)
-    .then(onJetificableGroups(state, rnJetifier));
+    .then(onJetificableGroups(rnJetifier, state));
 
 const onRetrieveDependencies = ([rnJetifier, state]) => {
   if (state.packageInfos.length === 0) {
