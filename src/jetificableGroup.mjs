@@ -53,7 +53,9 @@ const retrieveAllFrom = (
 const jetify = (rnJetifier: RnJetifier) => (
   jetificableGroup: JetificableGroup
 ) =>
-  jetificableGroup.jetificablePaths.forEach(withRnJetifier.jetify(rnJetifier));
+  jetificableGroup.jetificablePaths.forEach(
+    withRnJetifier.jetifyIfNeeded(rnJetifier)
+  );
 
 const getWith = (
   jetificableGroupDict: JetificableGroupDict,

@@ -23,6 +23,11 @@ type RnJetifier = {|
   fromClassRegExps: Array<RegExp>
 |};
 
+type JetifyContext = {|
+  jetificable: string,
+  wasJetified: boolean
+|};
+
 const reduceGetInfo = ({fromClasses, toClasses}, jetificationMapping) => ({
   fromClasses: [...fromClasses, jetificationMapping.fromClass],
   toClasses: [...toClasses, jetificationMapping.toClass]
@@ -80,7 +85,7 @@ const retrieveJetificablePathsFrom = (
     retrieveJetificablePaths(rnJetifier)
   );
 
-const getFromClassRegExp = fromClasses => new RegExp(fromClasses, "g");
+const getFromClassRegExp = fromClass => new RegExp(fromClass, "g");
 
 const create = ({fromClasses, toClasses}) => ({
   fromClasses,
@@ -92,33 +97,47 @@ const readInfo = () => withJsonFile.read<RnJetifier>(rnJetifierInfoJsonPath);
 
 const retrieve = (): Promise<RnJetifier> => readInfo().then(create);
 
-const applyJetification = (rnJetifier, jetificable, jetificationIndex) =>
+const writeJetificableIfJetified = jetificablePath => ({
+  jetificable,
+  wasJetified
+}) => {
+  if (wasJetified) {
+    withUtf8File.write(jetificablePath, jetificable);
+  }
+};
+
+const jetify = (rnJetifier, jetificable, jetificationIndex) =>
   jetificable.replace(
     rnJetifier.fromClassRegExps[jetificationIndex],
     rnJetifier.toClasses[jetificationIndex]
   );
 
+const applyJetification = (rnJetifier, {jetificable}, jetificationIndex) => ({
+  jetificable: jetify(rnJetifier, jetificable, jetificationIndex),
+  wasJetified: true
+});
+
 const applyJetificationIfNeeded = rnJetifier => (
-  jetificable,
+  context,
   jetificationFromClass,
   jetificationIndex
 ) =>
-  jetificable.includes(jetificationFromClass)
-    ? applyJetification(rnJetifier, jetificable, jetificationIndex)
-    : jetificable;
+  context.jetificable.includes(jetificationFromClass)
+    ? applyJetification(rnJetifier, context, jetificationIndex)
+    : context;
 
 const applyAllJetifications = rnJetifier => jetificable =>
-  rnJetifier.fromClasses.reduce<string>(
+  rnJetifier.fromClasses.reduce<JetifyContext>(
     applyJetificationIfNeeded(rnJetifier),
-    jetificable
+    {jetificable, wasJetified: false}
   );
 
-const jetify = (rnJetifier: RnJetifier) => (jetificablePath: string) =>
+const jetifyIfNeeded = (rnJetifier: RnJetifier) => (jetificablePath: string) =>
   withUtf8File
     .read(jetificablePath)
     .then(applyAllJetifications(rnJetifier))
-    .then(jetificable => withUtf8File.write(jetificablePath, jetificable));
+    .then(writeJetificableIfJetified(jetificablePath));
 
-export {jetify, retrieve, retrieveJetificablePathsFrom, writeInfoFrom};
+export {jetifyIfNeeded, retrieve, retrieveJetificablePathsFrom, writeInfoFrom};
 
 export type {RnJetifier};
