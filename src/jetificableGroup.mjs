@@ -21,12 +21,24 @@ const reduceCreateDict = (jetificableGroupDict, jetificableGroup) => ({
   [getDictKey(jetificableGroup.packageInfo)]: jetificableGroup
 });
 
+const sortByPackageKey = (
+  firstGroup: JetificableGroup,
+  secondGroup: JetificableGroup
+) =>
+  getDictKey(firstGroup.packageInfo).localeCompare(
+    getDictKey(secondGroup.packageInfo)
+  );
+
+const sortGroups = (
+  jetificableGroups: Array<JetificableGroup>
+): Array<JetificableGroup> => [...jetificableGroups.sort(sortByPackageKey)];
+
 const createDict = (
   jetificableGroups: Array<JetificableGroup>
 ): JetificableGroupDict => jetificableGroups.reduce(reduceCreateDict, {});
 
 const save = (filePath: string, jetificableGroups: Array<JetificableGroup>) =>
-  withJsonFile.write(filePath, createDict(jetificableGroups));
+  withJsonFile.write(filePath, createDict(sortGroups(jetificableGroups)));
 
 const retrieveSaved = (filePath): Promise<JetificableGroupDict> =>
   withJsonFile.read(filePath);
